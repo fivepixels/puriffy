@@ -1,0 +1,21 @@
+{
+  "name": "puriffy",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "check": "bun run lint && bun run format",
+    "lint": "bunx eslint --fix .",
+    "format": "bunx prettier --write ."
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@typescript-eslint/eslint-plugin": "^7.3.0",
+    "@typescript-eslint/parser": "^7.3.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.2.5"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
