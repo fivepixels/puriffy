@@ -1,21 +1,65 @@
 {
   "name": "puriffy",
-  "module": "index.ts",
-  "type": "module",
+  "description": "the cleanest way to build a web service",
+  "version": "0.0.1",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "private": true,
+  "license": "MIT",
+  "homepage": "https://puriffy.dev",
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "puriffy",
+    "puriffy.js"
+  ],
+  "author": {
+    "name": "Seol SO",
+    "url": "https://fivepixels.dev",
+    "email": "hi@fivepixels.dev"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/fivepixels"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/puriffy/puriffy"
+  },
+  "bugs": {
+    "url": "https://github.com/puriffy/puriffy/issues/new",
+    "email": "hi@fivepixels.dev"
+  },
   "scripts": {
-    "check": "bun run lint && bun run format",
-    "lint": "bunx eslint --fix .",
-    "format": "bunx prettier --write ."
+    "build": "bun run ./scripts/build.ts",
+    "dev": "nodemon",
+    "test": "bun test",
+    "format": "bunx prettier --write . && bunx eslint --fix ."
+  },
+  "dependencies": {
+    "puriffy": "link:puriffy"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "@typescript-eslint/eslint-plugin": "^7.3.0",
     "@typescript-eslint/parser": "^7.3.0",
+    "bun-plugin-dts": "^0.2.2",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
+    "nodemon": "^3.1.0",
     "prettier": "^3.2.5"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "nodemonConfig": {
+    "exec": "bun run build && bun run test",
+    "watch": [
+      "src",
+      "test"
+    ],
+    "ext": "ts"
   }
 }
