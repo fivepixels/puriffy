@@ -7,7 +7,7 @@ await build({
   minify: {
     whitespace: true,
     syntax: true,
-    identifiers: false
+    identifiers: false,
   },
   splitting: false,
   sourcemap: "inline",
@@ -16,8 +16,8 @@ await build({
     dts({
       output: {
         sortNodes: true,
-        noBanner: false
-      }
-    })
-  ]
+        noBanner: false,
+      },
+    }),
+  ],
 });

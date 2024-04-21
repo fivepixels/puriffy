@@ -29,8 +29,8 @@
 
     "paths": {
       "@src/*": ["./src/*"],
-      "@core/*": ["./src/core/*"],
-      "@test/*": ["./test/*"]
+      "@test/*": ["./test/*"],
+      "@type/*": ["./types/*"]
     }
   },
   "include": ["./src", "./test"],

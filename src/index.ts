@@ -1,21 +1,3 @@
-class Puriffy {
-  constructor() {}
+import compile from "@src/converter/compiler";
 
-  public addNumber(firstNumber: number, secondNumber: number) {
-    return firstNumber + secondNumber;
-  }
-
-  public subtractNumber(firstNumber: number, secondNumber: number) {
-    return firstNumber - secondNumber;
-  }
-
-  public multiplyNumber(firstNumber: number, secondNumber: number) {
-    return firstNumber * secondNumber;
-  }
-
-  public devideNumber(firstNumber: number, secondNumber: number) {
-    return firstNumber / secondNumber;
-  }
-}
-
-export default Puriffy;
+export { compile };
