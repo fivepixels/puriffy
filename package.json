@@ -36,20 +36,16 @@
     "build": "bun run ./scripts/build.ts",
     "dev": "nodemon",
     "test": "bun test",
-    "format": "bunx prettier --write . && bunx eslint --fix ."
+    "check": "bunx @biomejs/biome check --apply src test"
   },
   "dependencies": {
     "puriffy": "link:puriffy"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.7.0",
     "@types/bun": "latest",
-    "@typescript-eslint/eslint-plugin": "^7.3.0",
-    "@typescript-eslint/parser": "^7.3.0",
-    "bun-plugin-dts": "^0.2.2",
-    "eslint": "^8.57.0",
-    "eslint-config-prettier": "^9.1.0",
-    "nodemon": "^3.1.0",
-    "prettier": "^3.2.5"
+    "bun-plugin-dts": "^0.2.3",
+    "nodemon": "^3.1.0"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
