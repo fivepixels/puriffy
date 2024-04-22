@@ -1,63 +1,29 @@
 import type { Tag } from "@type/tag";
-import type { CompiledTag, Markers } from "@type/converter/compile";
+import type { CompiledTag, Marker } from "@type/converter/compile";
 
 interface CompilingSettings {
   compilingTag: Tag;
-  exisitingMarkers?: Markers[];
+  hydrationIds?: string[];
 }
 
 function compile({
   compilingTag,
-  exisitingMarkers = [],
+  hydrationIds = [],
 }: CompilingSettings): CompiledTag {
-  const basePropertyString = getProperties(compilingTag);
-  let baseChildrenString = "";
+  const baseString = getChildren(compilingTag);
 
-  if (compilingTag.children) {
-    const isSimple =
-      typeof compilingTag.children === "string" ||
-      typeof compilingTag.children === "number";
-    if (isSimple) {
-      baseChildrenString += compilingTag.children.toString();
-    }
-
-    const areChildren = Array.isArray(compilingTag.children);
-    if (areChildren) {
-      for (const currentChild of compilingTag.children as Tag[]) {
-        const compiledChildren = compile({
-          compilingTag: currentChild,
-          exisitingMarkers: exisitingMarkers,
-        });
-        baseChildrenString += compiledChildren.baseString;
-        exisitingMarkers.concat(compiledChildren.markers);
-      }
-    }
-
-    const isTag = Object.hasOwn(compilingTag.children as object, "tag");
-    if (isTag) {
-      const compiledChildren = compile({
-        compilingTag: compilingTag.children as Tag,
-        exisitingMarkers: exisitingMarkers,
-      });
-      baseChildrenString += compiledChildren.baseString;
-      exisitingMarkers.concat(compiledChildren.markers);
-    }
-
-    const isHydrationId = Object.hasOwn(
-      compilingTag.children as object,
-      "hydrationId",
-    );
-    if (isHydrationId) {
-      baseChildrenString += `#(${
-        (compilingTag.children as Markers).hydrationId
-      })#`;
-      exisitingMarkers.push(compilingTag.children as Markers);
-    }
+  if (hydrationIds.length === 0) {
+    return {
+      baseString,
+      markers: [],
+    };
   }
 
+  const markers = getMarkers(baseString, hydrationIds);
+
   return {
-    baseString: `<${compilingTag.tag}${basePropertyString}>${baseChildrenString}</${compilingTag.tag}>`,
-    markers: exisitingMarkers,
+    baseString,
+    markers,
   };
 }
 
@@ -67,7 +33,12 @@ function getProperties(tag: Tag): string {
     const currentProperty = _currentProperty as keyof Tag;
     const currentPropertyValue = tag[currentProperty as keyof Tag];
 
-    if (currentProperty === "tag" || currentProperty === "children") continue;
+    if (
+      currentProperty === "tag" ||
+      currentProperty === "children" ||
+      currentProperty === "hydrationId"
+    )
+      continue;
 
     if (currentProperty === "styles") {
       // TODO: Build a funciton only for this
@@ -79,6 +50,85 @@ function getProperties(tag: Tag): string {
   }
 
   return basePropertyString;
+}
+
+function getChildren(tag: Tag): string {
+  const basePropertyString = getProperties(tag);
+  let baseChildrenString = "";
+
+  if (tag.children) {
+    const childrenType = typeof tag.children;
+    const isSimple = childrenType === "string" || childrenType === "number";
+
+    if (isSimple) {
+      baseChildrenString += tag.children.toString();
+
+      return generateTag(tag.tag, basePropertyString, baseChildrenString);
+    }
+
+    const areChildren = Array.isArray(tag.children);
+    if (areChildren) {
+      let childrensString = "";
+
+      for (const currentChild of tag.children as Tag[]) {
+        const compiledChildren = compile({
+          compilingTag: currentChild,
+        });
+        childrensString += compiledChildren.baseString;
+      }
+
+      baseChildrenString += childrensString;
+
+      return generateTag(tag.tag, basePropertyString, baseChildrenString);
+    }
+
+    const isChild = Object.hasOwn(tag.children as Tag, "tag") && !areChildren;
+    if (isChild) {
+      const compiledChildren = compile({
+        compilingTag: tag.children as Tag,
+      });
+
+      baseChildrenString += compiledChildren.baseString;
+
+      return generateTag(tag.tag, basePropertyString, baseChildrenString);
+    }
+  }
+
+  return generateTag(tag.tag, basePropertyString, baseChildrenString);
+}
+
+function generateTag(
+  tagName: string,
+  tagProperties: string,
+  tagChildren: string,
+): string {
+  return `<${tagName}${tagProperties}>${tagChildren}</${tagName}>`;
+}
+
+function getMarkers(baseString: string, hydrationIds: string[]): Marker[] {
+  const markers: Marker[] = [];
+
+  for (const currentHydrationId of hydrationIds) {
+    const positions: number[] = [];
+
+    let startIndex = 0;
+    while (startIndex < baseString.length) {
+      const index = baseString.indexOf(`#(${currentHydrationId})#`, startIndex);
+      if (index !== -1) {
+        positions.push(index);
+        startIndex = index + currentHydrationId.length;
+      } else {
+        break;
+      }
+    }
+
+    markers.push({
+      hydrationId: currentHydrationId,
+      positions,
+    });
+  }
+
+  return markers;
 }
 
 export default compile;

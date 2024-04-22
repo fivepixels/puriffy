@@ -1,9 +1,9 @@
 export interface CompiledTag {
   baseString: string;
-  markers: Markers[];
+  markers: Marker[];
 }
 
-export interface Markers {
+export interface Marker {
   hydrationId: string;
-  position?: number;
+  positions?: number[];
 }

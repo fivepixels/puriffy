@@ -4,6 +4,7 @@ import { compile } from "puriffy";
 describe("testing complex compilation", () => {
   test("testing simple tags generation with marked places", () => {
     const compiledResult = compile({
+      hydrationIds: ["someTextFromHydration", "theSecondTextFromHydration"], // automatically attached by the `fromHydration`
       compilingTag: {
         tag: "main",
         children: [
@@ -13,15 +14,11 @@ describe("testing complex compilation", () => {
           },
           {
             tag: "p",
-            children: {
-              hydrationId: "someTextFromHydration",
-            },
+            children: "#(someTextFromHydration)#", // automatically attached by the `fromHydration`
           },
           {
             tag: "div",
-            children: {
-              hydrationId: "theSecondTextFromHydration",
-            },
+            children: "#(theSecondTextFromHydration)#",
           },
         ],
       },
@@ -33,9 +30,11 @@ describe("testing complex compilation", () => {
       markers: [
         {
           hydrationId: "someTextFromHydration",
+          positions: [30],
         },
         {
           hydrationId: "theSecondTextFromHydration",
+          positions: [64],
         },
       ],
     });
@@ -43,6 +42,7 @@ describe("testing complex compilation", () => {
 
   test("testing multiple properties generation with marked places", () => {
     const compiledResult = compile({
+      hydrationIds: ["someTextFromHydration"],
       compilingTag: {
         tag: "main",
         children: [
@@ -51,21 +51,20 @@ describe("testing complex compilation", () => {
             children: "Hello World!",
           },
           {
-            tag: "p",
-            children: {
-              hydrationId: "someTextFromHydration",
-            },
+            tag: "a",
+            href: "#(someTextFromHydration)#",
+            children: "Click this to go to some variable from hydration",
           },
         ],
       },
     });
 
     expect(compiledResult).toStrictEqual({
-      baseString:
-        "<main><h1>Hello World!</h1><p>#(someTextFromHydration)#</p></main>",
+      baseString: `<main><h1>Hello World!</h1><a href="#(someTextFromHydration)#">Click this to go to some variable from hydration</a></main>`,
       markers: [
         {
           hydrationId: "someTextFromHydration",
+          positions: [36],
         },
       ],
     });
@@ -73,6 +72,7 @@ describe("testing complex compilation", () => {
 
   test("testing children generation with marked places", () => {
     const compiledResult = compile({
+      hydrationIds: ["someTextFromHydration", "theSecondTextFromHydration"],
       compilingTag: {
         tag: "main",
         children: [
@@ -82,9 +82,36 @@ describe("testing complex compilation", () => {
           },
           {
             tag: "p",
-            children: {
-              hydrationId: "someTextFromHydration",
-            },
+            children: "#(someTextFromHydration)#",
+          },
+          {
+            tag: "div",
+            children: [
+              {
+                tag: "h3",
+                children: "#(someTextFromHydration)#",
+              },
+              {
+                tag: "p",
+                children:
+                  "Multiple Times; (#(theSecondTextFromHydration)#, #(someTextFromHydration)#, #(theSecondTextFromHydration)#)",
+              },
+              {
+                tag: "div",
+                children: [
+                  {
+                    tag: "span",
+                    children:
+                      "At the middle (#(theSecondTextFromHydration)#) of the text",
+                  },
+                  {
+                    tag: "p",
+                    children:
+                      "#(theSecondTextFromHydration)# even in the children",
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -92,10 +119,15 @@ describe("testing complex compilation", () => {
 
     expect(compiledResult).toStrictEqual({
       baseString:
-        "<main><h1>Hello World!</h1><p>#(someTextFromHydration)#</p></main>",
+        "<main><h1>Hello World!</h1><p>#(someTextFromHydration)#</p><div><h3>#(someTextFromHydration)#</h3><p>Multiple Times; (#(theSecondTextFromHydration)#, #(someTextFromHydration)#, #(theSecondTextFromHydration)#)</p><div><span>At the middle (#(theSecondTextFromHydration)#) of the text</span><p>#(theSecondTextFromHydration)# even in the children</p></div></div></main>",
       markers: [
         {
           hydrationId: "someTextFromHydration",
+          positions: [30, 68, 150],
+        },
+        {
+          hydrationId: "theSecondTextFromHydration",
+          positions: [118, 177, 238, 291],
         },
       ],
     });
