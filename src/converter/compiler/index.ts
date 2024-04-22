@@ -8,7 +8,7 @@ interface CompilingSettings {
   hydrationIds?: string[];
 }
 
-export default function compile({
+function compile({
   compilingTag,
   hydrationIds = [],
 }: CompilingSettings): CompiledTag {
@@ -28,3 +28,5 @@ export default function compile({
     markers,
   };
 }
+
+export default compile;
