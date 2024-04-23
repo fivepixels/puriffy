@@ -2,8 +2,8 @@ import { describe, expect, test } from "bun:test";
 import { compile } from "puriffy";
 
 import {
-  simpleWithPlain,
   simpleWithChildren,
+  simpleWithPlain,
   simpleWithProperties,
 } from "./constants";
 

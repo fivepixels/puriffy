@@ -1,5 +1,5 @@
-import { getChildren } from "./getChildren";
 import type { Tag } from "@type/tag";
+import { getChildren } from "./getChildren";
 
 function compile(compilingPage: Tag): string {
   const baseString = getChildren(compilingPage);
