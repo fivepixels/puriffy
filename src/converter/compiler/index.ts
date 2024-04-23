@@ -1,32 +1,10 @@
-import type { CompiledTag } from "@type/converter/compile";
-import type { Tag } from "@type/tag";
 import { getChildren } from "./getChildren";
-import { getMarkers } from "./getMarkers";
+import type { Tag } from "@type/tag";
 
-interface CompilingSettings {
-  compilingTag: Tag;
-  hydrationIds?: string[];
-}
+function compile(compilingPage: Tag): string {
+  const baseString = getChildren(compilingPage);
 
-function compile({
-  compilingTag,
-  hydrationIds = [],
-}: CompilingSettings): CompiledTag {
-  const baseString = getChildren(compilingTag);
-
-  if (hydrationIds.length === 0) {
-    return {
-      baseString,
-      markers: [],
-    };
-  }
-
-  const markers = getMarkers(baseString, hydrationIds);
-
-  return {
-    baseString,
-    markers,
-  };
+  return baseString;
 }
 
 export default compile;

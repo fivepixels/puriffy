@@ -6,16 +6,10 @@ export function getProperties(tag: Tag): string {
     const currentProperty = _currentProperty as keyof Tag;
     const currentPropertyValue = tag[currentProperty as keyof Tag];
 
-    if (
-      currentProperty === "tag" ||
-      currentProperty === "children" ||
-      currentProperty === "hydrationId"
-    )
-      continue;
+    if (currentProperty === "tag" || currentProperty === "children") continue;
 
     if (currentProperty === "styles") {
       // TODO: Build a funciton only for this
-
       continue;
     }
 

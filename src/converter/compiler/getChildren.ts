@@ -22,25 +22,18 @@ export function getChildren(tag: Tag): string {
       let childrensString = "";
 
       for (const currentChild of tag.children as Tag[]) {
-        const compiledChildren = compile({
-          compilingTag: currentChild,
-        });
-        childrensString += compiledChildren.baseString;
+        const compiledChildren = compile(currentChild);
+        childrensString += compiledChildren;
       }
 
       baseChildrenString += childrensString;
-
       return getTag(tag.tag, basePropertyString, baseChildrenString);
     }
 
     const isChild = Object.hasOwn(tag.children as Tag, "tag") && !areChildren;
     if (isChild) {
-      const compiledChildren = compile({
-        compilingTag: tag.children as Tag,
-      });
-
-      baseChildrenString += compiledChildren.baseString;
-
+      const compiledChildren = compile(tag.children as Tag);
+      baseChildrenString += compiledChildren;
       return getTag(tag.tag, basePropertyString, baseChildrenString);
     }
   }

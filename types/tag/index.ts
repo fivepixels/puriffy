@@ -1,20 +1,11 @@
-import type { Marker } from "@type/converter/compile";
 import type { Style } from "../styles";
 import type { AllTags } from "./names";
-
-export interface WholePage {
-  head: {
-    title: string;
-  };
-  main: Tag[];
-}
 
 export type DirectlyConvertibleTypes = string | number;
 export type DirectlyInconvertibleTypes = Tag | Tag[];
 export type BaseTagChildren =
   | DirectlyConvertibleTypes
-  | DirectlyInconvertibleTypes
-  | Marker;
+  | DirectlyInconvertibleTypes;
 
 export interface BaseTag {
   tag: AllTags;
@@ -22,7 +13,6 @@ export interface BaseTag {
   class?: string;
   styles?: Style;
   children?: BaseTagChildren;
-  hydrationId?: string[];
 }
 
 export type AnchorTagTarget = "current_tab" | "new_tab";
