@@ -1,8 +1,9 @@
 import { build } from "bun";
+import type { BuildConfig } from "bun";
 import dts from "bun-plugin-dts";
 
-await build({
-  entrypoints: ["./src/index.ts"],
+const defaultBuildingConfiguration: BuildConfig = {
+  entrypoints: [],
   outdir: "./dist",
   minify: {
     whitespace: true,
@@ -12,6 +13,12 @@ await build({
   splitting: false,
   sourcemap: "inline",
   format: "esm",
+  target: "bun",
+};
+
+await build({
+  ...defaultBuildingConfiguration,
+  entrypoints: ["./src/index.ts", "./src/cli/index.ts"],
   plugins: [
     dts({
       output: {
