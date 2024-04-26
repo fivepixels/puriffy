@@ -1,4 +1,6 @@
 import { build } from "bun";
+import path from "node:path";
+import fs from "node:fs/promises";
 import type { BuildConfig } from "bun";
 import dts from "bun-plugin-dts";
 
@@ -16,9 +18,12 @@ const defaultBuildingConfiguration: BuildConfig = {
   target: "bun",
 };
 
+await fs.rm(path.join(process.cwd(), "dist"), { recursive: true, force: true });
+
+// compile the core puriffy
 await build({
   ...defaultBuildingConfiguration,
-  entrypoints: ["./src/index.ts", "./src/cli/index.ts"],
+  entrypoints: [path.join(process.cwd(), "src", "index.ts")],
   plugins: [
     dts({
       output: {
@@ -27,4 +32,12 @@ await build({
       },
     }),
   ],
+});
+
+// compile the cli tools for puriffy
+await build({
+  ...defaultBuildingConfiguration,
+  entrypoints: [path.join(process.cwd(), "src", "cli", "index.ts")],
+  naming: "cli.js",
+  target: "node",
 });
