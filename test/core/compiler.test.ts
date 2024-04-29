@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { compile } from "puriffy";
+import compile from "@src/core/compiler";
 
 import {
   simpleWithChildren,
