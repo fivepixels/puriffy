@@ -23,6 +23,13 @@ program
   });
 
 program
+  .command("generate")
+  .description("generate whatever you want from your project.")
+  .action(() => {
+    console.log("GENERATE WHATEVER YOU WANT FROM YOUR PROJECT.");
+  });
+
+program
   .command("check")
   .description("check your project.")
   .action(() => {
