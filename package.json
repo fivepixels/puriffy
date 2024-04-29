@@ -38,7 +38,8 @@
   },
   "scripts": {
     "build": "bun run ./scripts/build.ts",
-    "dev": "nodemon",
+    "dev": "nodemon  --exec \"bun run build && bun run test\"",
+    "dev:server": "nodemon  --exec \"bun run build && bun run test && bun run ./dist/server.js\"",
     "test": "bun test",
     "check": "bunx @biomejs/biome check --apply src test"
   },
@@ -56,10 +57,11 @@
     "typescript": "^5.0.0"
   },
   "nodemonConfig": {
-    "exec": "bun run build && bun run test",
     "watch": [
       "src",
-      "test"
+      "scripts",
+      "test",
+      "puriffied"
     ],
     "ext": "ts"
   }
