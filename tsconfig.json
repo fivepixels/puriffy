@@ -30,9 +30,10 @@
     "paths": {
       "@src/*": ["./src/*"],
       "@test/*": ["./test/*"],
+      "@scripts/*": ["./scripts/*"],
       "@type/*": ["./types/*"]
     }
   },
-  "include": ["./src", "./test"],
+  "include": ["./src", "./test", "./scripts", "./app"],
   "exclude": ["./node_modules", "**/*.spec.ts"]
 }
