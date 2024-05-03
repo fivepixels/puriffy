@@ -21,6 +21,13 @@ async function compile() {
   // log
   // log the results
 
+  const checkingResult = await check();
+
+  fancyLog(checkingResult);
+
+  if (checkingResult.hasError) {
+    return;
+  }
 }
 
 export default compile;
