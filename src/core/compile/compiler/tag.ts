@@ -1,6 +1,6 @@
 import type { Tag } from "@type/tag";
-import { getProperties } from "./getProperties";
-import { getTag } from "./getTag";
+import { getProperties } from "./utils/getProperties";
+import { getTag } from "./utils/getTag";
 
 export function compileTag(tag: Tag): string {
   let baseChildrenString = "";
