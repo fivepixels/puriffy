@@ -29,21 +29,17 @@ export async function checkFiles(
   }
 
   for (const currentFolder of fileStructure.folders) {
-    const isFolderNameAllowed = /^[_]*[a-z]+[_]*$/.test(
-      currentFolder.folderName,
-    );
+    const isFolderNameAllowed = /^[_]*[a-z]+[_]*$/.test(currentFolder);
 
     if (!isFolderNameAllowed) {
       return {
-        content: `The folder | path: ${defaultCheckingFolder}/${currentFolder.folderName} | has an unallowed name. Remember, any folders for route must not have any letters, except for lowercase alphabets, and underscores at the beginning and last.`,
+        content: `The folder | path: ${defaultCheckingFolder}/${currentFolder} | has an unallowed name. Remember, any folders for route must not have any letters, except for lowercase alphabets, and underscores at the beginning and last.`,
         hasError: true,
       };
     }
 
     const currentFolderCheckingResult = await checkFiles(
-      `${defaultCheckingFolder ? defaultCheckingFolder : ""}/${
-        currentFolder.folderName
-      }`,
+      `${defaultCheckingFolder ? defaultCheckingFolder : ""}/${currentFolder}`,
     );
 
     if (currentFolderCheckingResult.hasError) {

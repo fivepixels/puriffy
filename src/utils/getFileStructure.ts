@@ -5,7 +5,7 @@ import { getFilePath } from "./getFilePath";
 interface FolderStructure {
   folderName: string;
   files: string[];
-  folders: FolderStructure[];
+  folders: string[];
 }
 
 async function getFileStructure(defaultPath: string): Promise<FolderStructure> {
@@ -17,12 +17,10 @@ async function getFileStructure(defaultPath: string): Promise<FolderStructure> {
   };
 
   for (const entry of entries) {
-    if (entry.isDirectory()) {
-      const subFolderPath = path.join(defaultPath, entry.name);
-      const subFolderStructure = await getFileStructure(subFolderPath);
-      folderStructure.folders.push(subFolderStructure);
-    } else if (entry.isFile()) {
+    if (entry.isFile()) {
       folderStructure.files.push(entry.name);
+    } else if (entry.isDirectory()) {
+      folderStructure.folders.push(entry.name);
     }
   }
 
