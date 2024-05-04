@@ -1,6 +1,6 @@
+import fs from "node:fs";
 import { getFilePath } from "@src/utils/getFilePath";
 import type { CheckReturn } from ".";
-import fs from "node:fs";
 
 export function checkTree(): CheckReturn {
   const checkingFolder = [

@@ -1,6 +1,6 @@
 import type { LogInfo } from "@src/utils/fancyLog";
-import { checkTree } from "./tree";
 import { checkFiles } from "./file";
+import { checkTree } from "./tree";
 
 export type FolderString = `/${string}` | `/${string}/${string}`;
 export interface CheckReturn {
