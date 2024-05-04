@@ -1,4 +1,4 @@
-import type { Tag } from "@type/tag";
+import type { Tag } from "@type/routes/page";
 import { getStyle } from "./getStyle";
 
 export function getProperties(tag: Tag): string {

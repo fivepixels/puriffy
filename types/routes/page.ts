@@ -20,19 +20,15 @@ export interface Tag {
   property?: string;
   name?: string;
   content?: string;
-}
-
-export interface Script {
-  type: ScriptType;
-  content: string;
+  type?: string;
 }
 
 export interface Head {
   title: string;
+  lang: string;
   description: string;
   author: string;
   keywords: string[];
-  lang: string;
 }
 
 export interface Body {
@@ -41,7 +37,29 @@ export interface Body {
   footer?: Tag[];
 }
 
-export interface Page {
+export interface PageReceive<T, U> {
+  fromCompilation: Compilation<T>;
+  fromHydration: Hydration<U>;
+}
+
+export interface PageReturn {
   head: Head;
   body: Body;
 }
+
+export type Compilation<T> = T;
+
+export type AllowedHydrationTypes = string | number;
+export type Hydration<T> = {
+  [K in keyof T]: T[K] extends AllowedHydrationTypes
+    ? {
+        use: T[K] extends Array<any>
+          ? (returnedComponents: (currentItem: T[K][0]) => Tag) => string
+          : () => string;
+      }
+    : Hydration<T>;
+};
+
+export type Page<T = void, U = void> = (
+  pageFunctions: PageReceive<T, U>,
+) => PageReturn;

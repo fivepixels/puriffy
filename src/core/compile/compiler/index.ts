@@ -1,8 +1,8 @@
-import type { Page } from "@type/tag";
+import type { PageReturn } from "@type/routes/page";
 import { compileBody } from "./body";
 import { compileHead } from "./head";
 
-async function compilePage(compilingPage: Page): Promise<string> {
+async function compilePage(compilingPage: PageReturn): Promise<string> {
   const HeadString = compileHead(compilingPage.head);
   const BodyString = await compileBody(compilingPage.body);
 

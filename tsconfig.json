@@ -34,6 +34,6 @@
       "@type/*": ["./types/*"]
     }
   },
-  "include": ["./src", "./test", "./scripts", "./app"],
+  "include": ["./src", "./types", "./test", "./scripts", "./app"],
   "exclude": ["./node_modules", "**/*.spec.ts"]
 }

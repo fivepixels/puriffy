@@ -1,4 +1,4 @@
-import type { Head } from "@type/tag";
+import type { Head } from "@type/routes/page";
 import { compileTag } from "./tag";
 
 export function compileHead(head: Head): string {

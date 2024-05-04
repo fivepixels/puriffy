@@ -1,4 +1,4 @@
-import type { Tag } from "@type/tag";
+import type { Tag } from "@type/routes/page";
 import { getProperties } from "./utils/getProperties";
 import { getTag } from "./utils/getTag";
 
