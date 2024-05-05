@@ -34,22 +34,22 @@
     "email": "hi@fivepixels.dev"
   },
   "bin": {
-    "puriffier": "./dist/cli.js"
+    "puriffier": "./src/cli/index.ts"
   },
   "scripts": {
-    "build": "bun run ./scripts/build.ts",
+    "build": "bun run ./scripts/build.ts && bun link puriffy",
     "dev": "nodemon  --exec \"bun run build && bun run test\"",
     "dev:server": "nodemon  --exec \"bun run build && bun run test && bun run ./dist/server.js\"",
     "test": "bun test",
     "check": "bunx @biomejs/biome check --apply src test"
   },
   "dependencies": {
-    "commander": "^12.0.0",
     "puriffy": "link:puriffy"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.7.0",
     "@types/bun": "latest",
+    "bun-plugin-dts": "^0.2.3",
     "nodemon": "^3.1.0"
   },
   "peerDependencies": {

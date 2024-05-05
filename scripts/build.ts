@@ -1,80 +1,29 @@
-import { build } from "bun";
-import fs from "node:fs/promises";
 import type { BuildConfig } from "bun";
-import type { Page } from "@type/tag";
-import compilePage from "@src/core/compiler/compilePage";
+import fs from "node:fs/promises";
 import { getFilePath } from "@src/utils/getFilePath";
+import dts from "bun-plugin-dts";
 
 export const defaultBuildingConfiguration: BuildConfig = {
   entrypoints: [],
   outdir: "./dist",
   splitting: false,
-  sourcemap: "inline",
-  format: "esm",
+  sourcemap: "none",
+  minify: true,
   target: "bun",
-  minify: {
-    whitespace: true,
-    syntax: true,
-    identifiers: false,
-  },
 };
 
 // remove the dist folder
 await fs.rm(getFilePath("dist"), { recursive: true, force: true });
 
 // compile the core puriffy
-await build({
+await Bun.build({
   ...defaultBuildingConfiguration,
-  entrypoints: [getFilePath("/src/index.ts")],
-});
-
-// compile the server typescript file
-await build({
-  ...defaultBuildingConfiguration,
-  entrypoints: [getFilePath("/src/core/server/index.ts")],
-  naming: "server.js",
-});
-
-// compile the client typescript file
-await build({
-  ...defaultBuildingConfiguration,
-  entrypoints: [getFilePath("/src/core/client/index.ts")],
-  naming: "client.js",
-});
-
-// compile the cli tools for puriffy
-await build({
-  ...defaultBuildingConfiguration,
-  entrypoints: [getFilePath("/src/cli/index.ts")],
-  naming: "cli.js",
+  entrypoints: [getFilePath("/src/core/index.ts")],
+  plugins: [dts({})],
+  minify: {
+    whitespace: true,
+    syntax: true,
+    identifiers: false,
+  },
   target: "node",
 });
-
-// compile the common js
-await Bun.build({
-  ...defaultBuildingConfiguration,
-  entrypoints: [getFilePath("src/core/client/common.ts")],
-  naming: "common.js",
-  sourcemap: "none",
-  outdir: getFilePath("/puriffied/public"),
-  target: "browser",
-});
-
-// compile the interaction js
-await Bun.build({
-  ...defaultBuildingConfiguration,
-  entrypoints: [getFilePath("src/core/client/interaction/index.ts")],
-  naming: "interaction.js",
-  sourcemap: "none",
-  outdir: getFilePath("/puriffied/public"),
-  target: "browser",
-});
-
-const compiledPage = await compilePage(
-  (await import(getFilePath("/app/pages/index.ts"))).default as Page,
-);
-const writer = Bun.file(getFilePath("/puriffied/index.html")).writer();
-
-writer.start();
-writer.write(compiledPage);
-writer.end();

@@ -1,53 +1,67 @@
-#!/usr/bin/env node
-import { Command } from "commander";
+#!/usr/bin/env bun
 
-const program = new Command("puriffier");
+import { check, build } from "@src/core";
 
-program
-  .name("puriffier")
-  .description("Puriffy's helper, puriffier.")
-  .version("0.0.1");
+main(Bun.argv[2], Bun.argv.slice(3));
 
-program
-  .command("begin")
-  .description("begin a puriffy project.")
-  .action(() => {
-    console.log("BEGIN A PURIFFY PROJECT");
-  });
+interface PuriffierCommands {
+  command: string;
+  description: string;
+  options?: CommandOptions[];
+  actions: (args: string[]) => void | Promise<void>;
+}
 
-program
-  .command("dev")
-  .description("test your project.")
-  .action(() => {
-    console.log("TEST YOUR PROJECT.");
-  });
+interface CommandOptions {
+  optionName: string;
+}
 
-program
-  .command("generate")
-  .description("generate whatever you want from your project.")
-  .action(() => {
-    console.log("GENERATE WHATEVER YOU WANT FROM YOUR PROJECT.");
-  });
+async function main(command: string, args: string[]): Promise<void> {
+  const puriffierCommands: PuriffierCommands[] = [
+    {
+      command: "begin",
+      description: "Begin a puriffy project.",
+      actions() {
+        console.log("!BEGIN!");
+      },
+    },
+    {
+      command: "dev",
+      description: "Test your puriffy project.",
+      actions() {
+        console.log("!DEV!");
+      },
+    },
+    {
+      command: "generate",
+      description: "Generate something on your puriffy project.",
+      actions() {
+        console.log("!GENERATE!");
+      },
+    },
+    {
+      command: "build",
+      description: "Build your puriffy project.",
+      async actions() {
+        await build();
+      },
+    },
+    {
+      command: "start",
+      description: "Start your puriffy project.",
+      actions() {
+        console.log("!START!");
+      },
+    },
+  ];
 
-program
-  .command("check")
-  .description("check your project.")
-  .action(() => {
-    console.log("CHECK YOUR PROJECT");
-  });
+  const indexOfFoundCommand = puriffierCommands.findIndex(
+    (value) => value.command === command,
+  );
 
-program
-  .command("build")
-  .description("build your project.")
-  .action(() => {
-    console.log("BUILD YOUR PROJECT");
-  });
+  if (command === "help" || indexOfFoundCommand <= -1) {
+    return;
+  }
 
-program
-  .command("start")
-  .description("start your built project.")
-  .action(() => {
-    console.log("START YOUR BUILT PROJECT");
-  });
-
-program.parse();
+  const foundCommand = puriffierCommands[indexOfFoundCommand];
+  await foundCommand.actions(args);
+}
