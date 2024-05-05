@@ -1,4 +1,4 @@
-import type { Head } from "./page";
+import type { Head } from "@type/tag/tag";
 
 export type RenderingMethod = "SSG" | "ISR" | "SSR";
 
@@ -8,10 +8,13 @@ export interface HydrationOptions {
   id: string;
 }
 
-export interface ProfileReturn {
+export interface Profile {
   method: RenderingMethod;
-  hydrationOptions: HydrationOptions;
-  metadata: Head;
+  hydrationOptions?: HydrationOptions;
+  metadata?: Partial<Head>;
 }
 
-export type Profile = Partial<ProfileReturn>;
+export interface MainProfile {
+  metadata: Head;
+  hydrationOptions?: HydrationOptions;
+}

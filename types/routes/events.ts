@@ -6,15 +6,15 @@ export interface EventsReturn {
   OnRequest: OnRequestFunction;
 }
 
-export type OnCompilationFunction<T extends any = void> = (
+export type OnCompilationFunction<T = void> = (
   compilationOption: OnCompilationRecieve,
 ) => Promise<T> | T;
 
-export type OnHydrationFunction<T extends any = void> = (
+export type OnHydrationFunction<T = void> = (
   hydrationOption: OnHydrationReceive,
 ) => Promise<T> | T;
 
-export type OnRequestFunction<T extends any = void> = (
+export type OnRequestFunction<T = void> = (
   requestOption: OnRequestReceive,
 ) => Promise<T> | T;
 
@@ -34,6 +34,11 @@ export interface OnRequestReceive {
   fromLocal: FromLocal;
   fromRequest: FromRequest;
 }
+
+export type FromCompilation<T> = T;
+export type FromHydration<T> = {
+  use: (id: keyof T) => string;
+};
 
 export type FromComputer = {
   cwd: string;
