@@ -1,9 +1,14 @@
+import type { AllTag } from "@type/routes/page";
+
 export function getTag(
-  tagName: string,
+  tagName: AllTag,
   tagProperties: string,
   tagChildren: string,
 ): string {
-  return `<${tagName}${tagProperties}>${tagChildren}${
-    tagName === "meta" ? "" : `</${tagName}>`
+  const closedTags: AllTag[] = ["meta", "link"];
+  const isClosed = closedTags.includes(tagName);
+
+  return `<${tagName}${tagProperties}${isClosed ? "/>" : ">"}${tagChildren}${
+    isClosed ? "" : `</${tagName}>`
   }`;
 }
