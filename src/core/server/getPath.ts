@@ -1,4 +1,4 @@
-import path from "node:path";
+import { getFilePath } from "@src/utils/getFilePath";
 
 interface DynamicRoute {
   id: string;
@@ -11,9 +11,9 @@ interface Route {
 }
 
 export function getPath(pathName: string, route: Route[]) {
-  return path.join(
-    process.cwd(),
+  return getFilePath([
     "puriffied",
-    pathName + (pathName.startsWith("/public") ? "" : "index.html"),
-  );
+    pathName,
+    pathName.startsWith("/public") ? "" : "/index.html",
+  ]);
 }
