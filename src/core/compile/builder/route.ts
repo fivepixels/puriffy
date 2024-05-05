@@ -22,48 +22,54 @@ async function buildPage(defaultPath: string): Promise<void> {
   if (defaultPath !== "")
     await fs.mkdir(getFilePath(["/puriffied/pages", defaultPath]));
 
-  const baseProfile = (await import(getFilePath("/app/puriffy.config.ts")))
-    .default as Partial<ProfileReturn>;
-  const profile = (
-    await import(getFilePath(["/app/pages", defaultPath, "profile.ts"]))
-  ).default as Partial<ProfileReturn>;
+  try {
+    const baseProfile = (await import(getFilePath("/app/puriffy.config.ts")))
+      .default as ProfileReturn;
 
-  const finalProfile = deepMerge<ProfileReturn>(baseProfile, profile);
+    const profile = (
+      await import(getFilePath(["/app/pages", defaultPath, "profile.ts"]))
+    ).default as Partial<ProfileReturn>;
 
-  const events = (await import(
-    getFilePath(["/app/pages", defaultPath, "events.ts"])
-  )) as EventReturn;
+    const finalProfile = deepMerge<ProfileReturn>(baseProfile, profile);
 
-  const returnedCompilationValue = await events.OnCompilation({
-    at: new Date(),
-  });
+    const events = (await import(
+      getFilePath(["/app/pages", defaultPath, "events.ts"])
+    )) as EventReturn;
 
-  const pageFunction = (
-    await import(getFilePath(["/app/pages", defaultPath, "page.ts"]))
-  ).default as Page<
-    ReturnType<typeof events.OnCompilation>,
-    ReturnType<typeof events.OnHydration>
-  >;
+    const returnedCompilationValue = await events.OnCompilation({
+      at: new Date(),
+      metadata: finalProfile.metadata,
+    });
 
-  const { body: pageBody, head: pageHead } = pageFunction({
-    fromCompilation: returnedCompilationValue,
-    fromHydration: {
-      use() {
-        return "asdfjkl";
+    const pageFunction = (
+      await import(getFilePath(["/app/pages", defaultPath, "page.ts"]))
+    ).default as Page<
+      ReturnType<typeof events.OnCompilation>,
+      ReturnType<typeof events.OnHydration>
+    >;
+
+    const { body: pageBody, head: pageHead } = pageFunction({
+      fromCompilation: returnedCompilationValue,
+      fromHydration: {
+        use(id: string) {
+          return `#(${id})#`;
+        },
       },
-    },
-  });
+    });
 
-  const mergedHead = deepMerge<typeof pageHead>(
-    finalProfile.metadata,
-    pageHead,
-  );
+    const mergedHead = deepMerge<typeof pageHead>(
+      finalProfile.metadata,
+      pageHead,
+    );
 
-  await fs.writeFile(
-    getFilePath(["/puriffied/pages", defaultPath, "index.html"]),
-    await compilePage({
-      body: pageBody,
-      head: mergedHead,
-    }),
-  );
+    await fs.writeFile(
+      getFilePath(["/puriffied/pages", defaultPath, "index.html"]),
+      await compilePage({
+        body: pageBody,
+        head: mergedHead,
+      }),
+    );
+  } catch (error) {
+    console.error(error);
+  }
 }

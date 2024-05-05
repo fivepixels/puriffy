@@ -4,7 +4,12 @@ function deepMerge<T>(target: any, source: any): T {
 
   for (const key in source) {
     if (Object.prototype.hasOwnProperty.call(source, key)) {
-      if (
+      const sourceElement = source[key];
+      const targetElement = target[key];
+
+      if (Array.isArray(sourceElement)) {
+        output[key] = sourceElement.concat(targetElement);
+      } else if (
         typeof source[key] === "object" &&
         source[key] !== null &&
         target[key]
