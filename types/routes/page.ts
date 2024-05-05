@@ -37,9 +37,9 @@ export interface Body {
   footer?: Tag[];
 }
 
-export interface PageReceive<T, U> {
-  fromCompilation: Compilation<T>;
-  fromHydration: Hydration<U>;
+export interface PageReceive<T = void, U = void> {
+  fromCompilation: T extends object ? Compilation<T> : undefined;
+  fromHydration?: Hydration<U>;
 }
 
 export interface PageReturn {
@@ -47,19 +47,10 @@ export interface PageReturn {
   body: Body;
 }
 
-export type Compilation<T> = T;
-
 export type AllowedHydrationTypes = string | number;
+export type Compilation<T> = T;
 export type Hydration<T> = {
-  [K in keyof T]: T[K] extends AllowedHydrationTypes
-    ? {
-        use: T[K] extends Array<any>
-          ? (returnedComponents: (currentItem: T[K][0]) => Tag) => string
-          : () => string;
-      }
-    : Hydration<T>;
+  use: (id: keyof T) => string;
 };
 
-export type Page<T = void, U = void> = (
-  pageFunctions: PageReceive<T, U>,
-) => PageReturn;
+export type Page<T, U> = (pageFunctions: PageReceive<T, U>) => PageReturn;

@@ -11,5 +11,7 @@ export interface HydrationOptions {
 export interface ProfileReturn {
   method: RenderingMethod;
   hydrationOptions: HydrationOptions;
-  metadata?: Partial<Head>;
+  metadata: Head;
 }
+
+export type Profile = Partial<ProfileReturn>;
