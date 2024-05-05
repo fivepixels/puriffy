@@ -1,56 +1,18 @@
-export type DirectlyConvertibleTypes = string | number;
-export type DirectlyInconvertibleTypes = Tag | Tag[];
-export type BaseTagChildren =
-  | DirectlyConvertibleTypes
-  | DirectlyInconvertibleTypes;
+import type { WebPage } from "@type/tag/tag";
+import type { FromComputer, FromLocal } from "./events";
 
-export type AllTag = keyof HTMLElementTagNameMap;
-export type ScriptType = "src" | "action";
+export type PageFunction<T, U> = (
+  pageFunctions: PageReceive<T, U>,
+) => WebPage<false>;
 
-export interface Tag {
-  tag: AllTag;
-  id?: string;
-  style?: string;
-  children?: BaseTagChildren;
-  href?: string;
-  src?: string;
-  alt?: string;
-  target?: string;
-  rel?: string;
-  property?: string;
-  name?: string;
-  content?: string;
-  type?: string;
+export interface PageReceive<T extends any = void, U extends any = void> {
+  fromComputer: FromComputer;
+  fromCompilation: FromCompilation<T>;
+  fromHydration: FromHydration<U>;
+  fromLocal: FromLocal;
 }
 
-export interface Head {
-  title: string;
-  lang: string;
-  description: string;
-  author: string;
-  keywords: string[];
-}
-
-export interface Body {
-  nav?: Tag[];
-  main: Tag[];
-  footer?: Tag[];
-}
-
-export interface PageReceive<T = void, U = void> {
-  fromCompilation: T extends object ? Compilation<T> : undefined;
-  fromHydration?: Hydration<U>;
-}
-
-export interface PageReturn {
-  head: Head;
-  body: Body;
-}
-
-export type AllowedHydrationTypes = string | number;
-export type Compilation<T> = T;
-export type Hydration<T> = {
+export type FromCompilation<T> = T;
+export type FromHydration<T> = {
   use: (id: keyof T) => string;
 };
-
-export type Page<T, U> = (pageFunctions: PageReceive<T, U>) => PageReturn;
