@@ -8,8 +8,8 @@
     "include": [
       "./src/*.ts",
       "./src/**/*.ts",
-      "./test/*.ts",
-      "./test/**/*.ts",
+      "./types/*.ts",
+      "./types/**/*.ts",
       "./scripts/*.ts"
     ],
     "rules": {

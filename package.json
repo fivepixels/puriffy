@@ -41,7 +41,7 @@
     "dev": "nodemon  --exec \"bun run build && bun run test\"",
     "dev:server": "nodemon  --exec \"bun run build && bun run test && bun run ./dist/server.js\"",
     "test": "bun test",
-    "check": "bunx @biomejs/biome check --apply src test"
+    "check": "bunx @biomejs/biome check --apply src types scripts"
   },
   "dependencies": {
     "puriffy": "link:puriffy"
