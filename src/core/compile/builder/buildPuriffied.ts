@@ -1,10 +1,11 @@
-import { getFilePath } from "@src/utils/getFilePath";
 import fs from "node:fs/promises";
+import { getFilePath } from "@src/utils/getFilePath";
 
 export async function buildPuriffied() {
   const puriffiedPath = getFilePath("/puriffied");
-
-  const isPuriffiedExist = (await fs.readdir(puriffiedPath)).length > 0;
+  const isPuriffiedExist = (await fs.readdir(getFilePath(""))).includes(
+    "puriffied",
+  );
 
   if (isPuriffiedExist) {
     await fs.rm(puriffiedPath, { recursive: true, force: true });
@@ -16,6 +17,4 @@ export async function buildPuriffied() {
   await fs.mkdir(getFilePath("/puriffied/public/local"));
   await fs.mkdir(getFilePath("/puriffied/public/local/db"));
   await fs.mkdir(getFilePath("/puriffied/public/local/docs"));
-  await fs.mkdir(getFilePath("/puriffied/public/local/images"));
-  await fs.mkdir(getFilePath("/puriffied/public/local/videos"));
 }

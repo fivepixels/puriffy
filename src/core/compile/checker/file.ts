@@ -1,6 +1,6 @@
+import { getFilePath } from "@src/utils/getFilePath";
 import getFileStructure from "@src/utils/getFileStructure";
 import type { CheckReturn } from ".";
-import { getFilePath } from "@src/utils/getFilePath";
 
 export async function checkFiles(
   defaultCheckingFolder?: string,

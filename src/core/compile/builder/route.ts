@@ -1,11 +1,15 @@
+import fs from "node:fs/promises";
 import { getFilePath } from "@src/utils/getFilePath";
 import getFileStructure from "@src/utils/getFileStructure";
 import deepMerge from "@src/utils/mergeDeepObjects";
-import fs from "node:fs/promises";
-import type { ProfileReturn } from "@type/routes/profile";
-import type { EventReturn } from "@type/routes/events";
-import type { Page } from "@type/routes/page";
+import type { EventsReturn } from "@type/routes/events";
+import type { PageFunction } from "@type/routes/page";
+import type { MainProfile, Profile } from "@type/routes/profile";
+import type { Head } from "@type/tag/tag";
 import compilePage from "../compiler";
+import getFromComputer from "./from/computer";
+import getFromHydration from "./from/hydration";
+import getFromLocal from "./from/local";
 
 export async function buildRoutes(defaultPath = ""): Promise<void> {
   const basePath = getFilePath(["/app/pages", defaultPath]);
@@ -19,42 +23,25 @@ export async function buildRoutes(defaultPath = ""): Promise<void> {
 }
 
 async function buildPage(defaultPath: string): Promise<void> {
-  if (defaultPath !== "")
-    await fs.mkdir(getFilePath(["/puriffied/pages", defaultPath]));
-
   try {
-    const baseProfile = (await import(getFilePath("/app/puriffy.config.ts")))
-      .default as ProfileReturn;
+    if (defaultPath !== "")
+      await fs.mkdir(getFilePath(["/puriffied/pages", defaultPath]));
 
-    const profile = (
-      await import(getFilePath(["/app/pages", defaultPath, "profile.ts"]))
-    ).default as Partial<ProfileReturn>;
+    const finalProfile = await importProfile(defaultPath);
+    const events = await importEvents(defaultPath);
+    const pageFunction = await importPage(defaultPath);
 
-    const finalProfile = deepMerge<ProfileReturn>(baseProfile, profile);
-
-    const events = (await import(
-      getFilePath(["/app/pages", defaultPath, "events.ts"])
-    )) as EventReturn;
-
-    const returnedCompilationValue = await events.OnCompilation({
-      at: new Date(),
-      metadata: finalProfile.metadata,
+    const compilationValue = await events.OnCompilation({
+      fromComputer: getFromComputer(),
+      fromLocal: getFromLocal(),
+      fromMetadata: finalProfile.metadata as Head,
     });
 
-    const pageFunction = (
-      await import(getFilePath(["/app/pages", defaultPath, "page.ts"]))
-    ).default as Page<
-      ReturnType<typeof events.OnCompilation>,
-      ReturnType<typeof events.OnHydration>
-    >;
-
     const { body: pageBody, head: pageHead } = pageFunction({
-      fromCompilation: returnedCompilationValue,
-      fromHydration: {
-        use(id: string) {
-          return `#(${id})#`;
-        },
-      },
+      fromComputer: getFromComputer(),
+      fromCompilation: compilationValue,
+      fromHydration: getFromHydration(),
+      fromLocal: getFromLocal(),
     });
 
     const mergedHead = deepMerge<typeof pageHead>(
@@ -62,14 +49,44 @@ async function buildPage(defaultPath: string): Promise<void> {
       pageHead,
     );
 
+    const compiledPage = await compilePage({
+      body: pageBody,
+      head: mergedHead,
+    });
+
     await fs.writeFile(
       getFilePath(["/puriffied/pages", defaultPath, "index.html"]),
-      await compilePage({
-        body: pageBody,
-        head: mergedHead,
-      }),
+      compiledPage,
+    );
+    await fs.writeFile(
+      getFilePath(["/puriffied/pages", defaultPath, "info.json"]),
+      JSON.stringify({ method: finalProfile.method }),
     );
   } catch (error) {
     console.error(error);
   }
+}
+
+async function importProfile(defaultPath: string): Promise<Profile> {
+  const baseProfile = (await import(getFilePath("/app/puriffy.config.ts")))
+    .default as MainProfile;
+
+  const profile = (
+    await import(getFilePath(["/app/pages", defaultPath, "profile.ts"]))
+  ).default as Profile;
+
+  return deepMerge<Profile>(baseProfile, profile);
+}
+
+async function importEvents(defaultPath: string): Promise<EventsReturn> {
+  return (await import(
+    getFilePath(["/app/pages", defaultPath, "events.ts"])
+  )) as EventsReturn;
+}
+
+async function importPage(
+  defaultPath: string,
+): Promise<PageFunction<void, void>> {
+  return (await import(getFilePath(["/app/pages", defaultPath, "page.ts"])))
+    .default;
 }
