@@ -1,8 +1,9 @@
 import fs from "node:fs/promises";
 import { getFilePath } from "@src/utils/getFilePath";
-import type { FromLocal, LocalType } from "@type/routes/events";
+import type { FromLocal, LocalType } from "@type/index";
+import getFileStructure from "../getFileStructure";
 
-function getFromLocal(): FromLocal {
+export function getFromLocal(): FromLocal {
   const returnedObject: Partial<FromLocal> = {};
   const allLocalFileTypes: LocalType[] = ["db", "docs"];
 
@@ -10,6 +11,11 @@ function getFromLocal(): FromLocal {
     returnedObject[currentLocalType] = {
       async use(title) {
         return await getLocalFile(currentLocalType, title);
+      },
+      async getList() {
+        return await getFileStructure(
+          getFilePath(["/puriffied/public/local/", currentLocalType]),
+        );
       },
     };
   }
@@ -28,5 +34,3 @@ export async function getLocalFile(
     },
   );
 }
-
-export default getFromLocal;

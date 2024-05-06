@@ -1,4 +1,4 @@
-import type { Head } from "@type/tag/tag";
+import type { FolderStructure, Head } from "@type/index";
 
 export interface EventsReturn {
   OnCompilation: OnCompilationFunction;
@@ -10,8 +10,8 @@ export type OnCompilationFunction<T = void> = (
   compilationOption: OnCompilationRecieve,
 ) => Promise<T> | T;
 
-export type OnHydrationFunction<T = void> = (
-  hydrationOption: OnHydrationReceive,
+export type OnHydrationFunction<T = void, U = void> = (
+  hydrationOption: OnHydrationReceive<U>,
 ) => Promise<T> | T;
 
 export type OnRequestFunction<T = void> = (
@@ -19,19 +19,20 @@ export type OnRequestFunction<T = void> = (
 ) => Promise<T> | T;
 
 export interface OnCompilationRecieve {
-  fromComputer: FromComputer;
   fromLocal: FromLocal;
+  fromComputer: FromComputer;
   fromMetadata: FromMetadata;
 }
 
-export interface OnHydrationReceive {
-  fromComputer: FromComputer;
+export interface OnHydrationReceive<T = void> {
   fromLocal: FromLocal;
+  fromComputer: FromComputer;
+  fromRequest: T;
 }
 
 export interface OnRequestReceive {
-  fromComputer: FromComputer;
   fromLocal: FromLocal;
+  fromComputer: FromComputer;
   fromRequest: FromRequest;
 }
 
@@ -49,6 +50,7 @@ export type LocalType = "db" | "docs";
 export type FromLocal = {
   [K in LocalType]: {
     use: (title: string) => Promise<string>;
+    getList: () => Promise<FolderStructure>;
   };
 };
 

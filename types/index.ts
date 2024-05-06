@@ -6,6 +6,7 @@ import type {
   FromLocal,
   FromMetadata,
   FromRequest,
+  LocalType,
   OnCompilationFunction,
   OnCompilationRecieve,
   OnHydrationFunction,
@@ -30,6 +31,8 @@ export type { MainProfile, Profile, RenderingMethod };
 export type { PageFunction, PageReceive };
 
 export type { EventsReturn };
+export type { LocalType };
+
 export type {
   FromCompilation,
   FromHydration,
@@ -38,6 +41,7 @@ export type {
   FromRequest,
   FromMetadata,
 };
+
 export type {
   OnCompilationFunction,
   OnHydrationFunction,
@@ -57,3 +61,11 @@ export type {
   DirectlyInconvertibleTypes,
   AllTag,
 };
+
+interface FolderStructure {
+  folderName: string;
+  files: string[];
+  folders: string[];
+}
+
+export type { FolderStructure };

@@ -1,4 +1,4 @@
-import type { AllTag } from "@type/routes/page";
+import type { AllTag } from "@type/index";
 
 export function getTag(
   tagName: AllTag,

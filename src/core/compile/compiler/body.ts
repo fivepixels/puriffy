@@ -1,4 +1,4 @@
-import type { Body } from "@type/routes/page";
+import type { Body } from "@type/index";
 import { compileTag } from "./tag";
 import { getCommonJs } from "./utils/getCommonJs";
 

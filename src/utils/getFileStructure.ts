@@ -1,11 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-
-interface FolderStructure {
-  folderName: string;
-  files: string[];
-  folders: string[];
-}
+import type { FolderStructure } from "@type/index";
 
 async function getFileStructure(defaultPath: string): Promise<FolderStructure> {
   const entries = await fs.readdir(defaultPath, { withFileTypes: true });

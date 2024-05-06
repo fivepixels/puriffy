@@ -11,8 +11,8 @@ export type PageFunction<T, U> = (
 ) => WebPage<false>;
 
 export interface PageReceive<T = void, U = void> {
+  fromLocal: FromLocal;
   fromComputer: FromComputer;
   fromCompilation: FromCompilation<T>;
   fromHydration: FromHydration<U>;
-  fromLocal: FromLocal;
 }

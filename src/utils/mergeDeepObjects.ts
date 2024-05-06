@@ -1,5 +1,5 @@
 // biome-ignore lint/suspicious/noExplicitAny: those two parameters have too complex shapes
-function deepMerge<T>(target: any, source: any): T {
+export function deepMerge<T>(target: any, source: any): T {
   const output = Object.assign({}, target);
 
   for (const key in source) {
@@ -23,5 +23,3 @@ function deepMerge<T>(target: any, source: any): T {
 
   return output as T;
 }
-
-export default deepMerge;

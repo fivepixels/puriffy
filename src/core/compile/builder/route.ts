@@ -1,15 +1,19 @@
 import fs from "node:fs/promises";
+import { defaultBuildingConfiguration } from "@scripts/build";
+import { getFromComputer } from "@src/utils/from/computer";
+import { getFromHydration } from "@src/utils/from/hydration";
+import { getFromLocal } from "@src/utils/from/local";
 import { getFilePath } from "@src/utils/getFilePath";
 import getFileStructure from "@src/utils/getFileStructure";
-import deepMerge from "@src/utils/mergeDeepObjects";
-import type { EventsReturn } from "@type/routes/events";
-import type { PageFunction } from "@type/routes/page";
-import type { MainProfile, Profile } from "@type/routes/profile";
-import type { Head } from "@type/tag/tag";
+import { deepMerge } from "@src/utils/mergeDeepObjects";
+import type {
+  EventsReturn,
+  Head,
+  MainProfile,
+  PageFunction,
+  Profile,
+} from "@type/index";
 import compilePage from "../compiler";
-import getFromComputer from "./from/computer";
-import getFromHydration from "./from/hydration";
-import getFromLocal from "./from/local";
 
 export async function buildRoutes(defaultPath = ""): Promise<void> {
   const basePath = getFilePath(["/app/pages", defaultPath]);
@@ -31,7 +35,7 @@ async function buildPage(defaultPath: string): Promise<void> {
     const events = await importEvents(defaultPath);
     const pageFunction = await importPage(defaultPath);
 
-    const compilationValue = await events.OnCompilation({
+    const resultFromCompilation = await events.OnCompilation({
       fromComputer: getFromComputer(),
       fromLocal: getFromLocal(),
       fromMetadata: finalProfile.metadata as Head,
@@ -39,7 +43,7 @@ async function buildPage(defaultPath: string): Promise<void> {
 
     const { body: pageBody, head: pageHead } = pageFunction({
       fromComputer: getFromComputer(),
-      fromCompilation: compilationValue,
+      fromCompilation: resultFromCompilation,
       fromHydration: getFromHydration(),
       fromLocal: getFromLocal(),
     });
@@ -51,17 +55,24 @@ async function buildPage(defaultPath: string): Promise<void> {
 
     const compiledPage = await compilePage({
       body: pageBody,
-      head: mergedHead,
+      head: mergedHead as Head,
     });
 
     await fs.writeFile(
       getFilePath(["/puriffied/pages", defaultPath, "index.html"]),
       compiledPage,
     );
-    await fs.writeFile(
-      getFilePath(["/puriffied/pages", defaultPath, "info.json"]),
-      JSON.stringify({ method: finalProfile.method }),
-    );
+
+    await Bun.build({
+      ...defaultBuildingConfiguration,
+      entrypoints: [getFilePath(["/app/pages", defaultPath, "events.ts"])],
+      outdir: getFilePath(["/puriffied/pages", defaultPath]),
+      minify: {
+        whitespace: true,
+        syntax: true,
+        identifiers: false,
+      },
+    });
   } catch (error) {
     console.error(error);
   }
