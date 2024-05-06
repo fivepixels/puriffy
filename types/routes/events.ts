@@ -1,4 +1,5 @@
 import type { FolderStructure, Head } from "@type/index";
+import type { Server } from "bun";
 
 export interface EventsReturn {
   OnCompilation: OnCompilationFunction;
@@ -27,24 +28,19 @@ export interface OnCompilationRecieve {
 export interface OnHydrationReceive<T = void> {
   fromLocal: FromLocal;
   fromComputer: FromComputer;
-  fromRequest: T;
+  fromRequest?: T;
 }
 
 export interface OnRequestReceive {
   fromLocal: FromLocal;
   fromComputer: FromComputer;
+  fromServer: FromServer;
   fromRequest: FromRequest;
 }
 
 export type FromCompilation<T> = T;
-export type FromHydration<T> = {
-  use: (id: keyof T) => string;
-};
-
-export type FromComputer = {
-  cwd: string;
-  time: Date;
-};
+export type FromHydration<T> = { use: (id: keyof T) => string };
+export type FromRequest = Request;
 
 export type LocalType = "db" | "docs";
 export type FromLocal = {
@@ -54,5 +50,10 @@ export type FromLocal = {
   };
 };
 
-export type FromRequest = Request;
+export type FromComputer = {
+  cwd: string;
+  time: Date;
+};
+
 export type FromMetadata = Head;
+export type FromServer = Server;

@@ -12,21 +12,34 @@ import type {
   MainProfile,
   PageFunction,
   Profile,
+  RouteInfo,
 } from "@type/index";
 import compilePage from "../compiler";
 
-export async function buildRoutes(defaultPath = ""): Promise<void> {
+export async function buildRoutes(
+  defaultPath = "",
+  defaultRouteInfo?: RouteInfo,
+): Promise<RouteInfo | undefined> {
   const basePath = getFilePath(["/app/pages", defaultPath]);
   const fileStructure = await getFileStructure(basePath);
 
-  await buildPage(defaultPath);
+  const currentRouteInfo = await buildPage(defaultPath, defaultRouteInfo);
+  let childrenRouteInfo: RouteInfo | undefined;
 
   for (const currentFolder of fileStructure.folders) {
-    await buildRoutes(`${defaultPath}/${currentFolder}`);
+    childrenRouteInfo = await buildRoutes(
+      `${defaultPath}/${currentFolder}`,
+      currentRouteInfo,
+    );
   }
+
+  return currentRouteInfo;
 }
 
-async function buildPage(defaultPath: string): Promise<void> {
+async function buildPage(
+  defaultPath: string,
+  defaultRouteInfo?: RouteInfo,
+): Promise<RouteInfo | undefined> {
   try {
     if (defaultPath !== "")
       await fs.mkdir(getFilePath(["/puriffied/pages", defaultPath]));
@@ -73,8 +86,14 @@ async function buildPage(defaultPath: string): Promise<void> {
         identifiers: false,
       },
     });
+
+    return {
+      index: finalProfile.method,
+      ...defaultRouteInfo,
+    };
   } catch (error) {
     console.error(error);
+    return;
   }
 }
 

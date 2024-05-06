@@ -1,9 +1,10 @@
 import type {
   EventsReturn,
-  FromCompilation,
-  FromComputer,
-  FromHydration,
   FromLocal,
+  FromComputer,
+  FromServer,
+  FromCompilation,
+  FromHydration,
   FromMetadata,
   FromRequest,
   LocalType,
@@ -16,6 +17,7 @@ import type {
 } from "./routes/events";
 import type { PageFunction, PageReceive } from "./routes/page";
 import type { MainProfile, Profile, RenderingMethod } from "./routes/profile";
+import type { RouteInfo } from "./routes/routeInfo";
 import type {
   AllTag,
   BaseTagChildren,
@@ -36,8 +38,9 @@ export type { LocalType };
 export type {
   FromCompilation,
   FromHydration,
-  FromComputer,
+  FromServer,
   FromLocal,
+  FromComputer,
   FromRequest,
   FromMetadata,
 };
@@ -69,3 +72,4 @@ interface FolderStructure {
 }
 
 export type { FolderStructure };
+export type { RouteInfo };

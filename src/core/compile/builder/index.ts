@@ -1,4 +1,4 @@
-import { buildPuriffied } from "./buildPuriffied";
+import { buildPuriffied } from "./puriffied";
 import { buildPreWrittenFiles } from "./prewritten";
 import { buildRoutes } from "./route";
 
