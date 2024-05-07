@@ -29,7 +29,7 @@ export async function checkFiles(
   }
 
   for (const currentFolder of fileStructure.folders) {
-    const isFolderNameAllowed = /^[_]*[a-z]+[_]*$/.test(currentFolder);
+    const isFolderNameAllowed = /^_[a-z]+$/.test(currentFolder);
 
     if (!isFolderNameAllowed) {
       return {
