@@ -1,7 +1,6 @@
 import fs from "node:fs/promises";
 import { getFilePath } from "@src/utils/getFilePath";
 import type { BuildConfig } from "bun";
-import dts from "bun-plugin-dts";
 
 export const defaultBuildingConfiguration: BuildConfig = {
   entrypoints: [],
@@ -25,11 +24,4 @@ await Bun.build({
     syntax: true,
     identifiers: false,
   },
-});
-
-// compile the type file
-await Bun.build({
-  ...defaultBuildingConfiguration,
-  entrypoints: [getFilePath("/types/index.ts")],
-  plugins: [dts({})],
 });
