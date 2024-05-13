@@ -39,7 +39,7 @@
   "scripts": {
     "build": "bun run ./scripts/build.ts && bun link puriffy",
     "dev": "nodemon  --exec \"bun run build && bun run test\"",
-    "dev:server": "nodemon  --exec \"bun run build && bun run test && bun run ./dist/server.js\"",
+    "dev:server": "nodemon  --exec \"bun run build && puriffier build && bun run ./puriffied/server.js\"",
     "test": "bun test",
     "check": "bunx @biomejs/biome check --apply src types scripts"
   },
