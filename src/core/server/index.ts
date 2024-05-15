@@ -1,52 +1,57 @@
 import { getFromComputer } from "@src/utils/from/computer";
 import { getFromLocal } from "@src/utils/from/local";
-import type { EventsReturn } from "@type/index";
-import hydrate from "./hydrator";
-import { getPageInfo } from "./utils/getPagePath";
 import type { Server } from "bun";
+import hydrate from "./hydrator";
+import { getPageRenderingInfo } from "./utils/getPageRenderingInfo";
+import type { PageInfoJSON } from "./utils/getPageRenderingInfo";
+import type { ServerReturn } from "@type/index";
+import { getFilePath } from "@src/utils/getFilePath";
+
+const PageInfo = (await import(getFilePath("/puriffied/info.json")))
+  .default as PageInfoJSON;
 
 Bun.serve({
   port: process.env.PORT || 3000,
   async fetch(request: Request, server: Server) {
-    const urlRoutes = new URL(request.url).pathname
-      .split("/")
-      .filter((part) => part !== "");
+    const urlRoutes = new URL(request.url).pathname;
+    const pageRenderingInfo = await getPageRenderingInfo(urlRoutes, PageInfo);
+    const pathToPage = getFilePath(pageRenderingInfo.path);
 
-    const pageInfo = getPageInfo(urlRoutes, {
-      index: "SSG",
-      blogs: {
-        index: "SSR",
-      },
-    });
+    const serverInfo = (await import(
+      `${pathToPage}/server.js`
+    )) as ServerReturn;
 
-    const events = (await import(`${pageInfo.path}/events.js`)) as EventsReturn;
+    if (
+      pageRenderingInfo.method === "SSG" ||
+      pageRenderingInfo.method === "ISR"
+    ) {
+      if (serverInfo.OnRequest) {
+        await serverInfo?.OnRequest({
+          fromLocal: getFromLocal(),
+          fromComputer: getFromComputer(),
+          fromRequest: request,
+          fromServer: server,
+        });
+      }
 
-    if (pageInfo.method === "SSG" || pageInfo.method === "ISR") {
-      await events.OnRequest({
-        fromLocal: getFromLocal(),
-        fromComputer: getFromComputer(),
-        fromRequest: request,
-        fromServer: server,
-      });
-
-      return new Response(Bun.file(`${pageInfo.path}/index.html`));
+      return new Response(Bun.file(`${pathToPage}/index.html`));
     }
 
-    if (pageInfo.method === "SSR") {
-      const resultFromRequest = await events.OnRequest({
+    if (pageRenderingInfo.method === "SSR") {
+      const requestResult = await serverInfo.OnRequest({
         fromLocal: getFromLocal(),
         fromComputer: getFromComputer(),
         fromRequest: request,
         fromServer: server,
       });
 
-      const resultFromHydration = await events.OnHydration({
+      const resultFromHydration = await serverInfo.OnHydration({
         fromLocal: getFromLocal(),
         fromComputer: getFromComputer(),
-        fromRequest: resultFromRequest,
+        fromRequest: requestResult,
       });
 
-      const page = await Bun.file(`${pageInfo.path}/index.html`).text();
+      const page = await Bun.file(`${pathToPage}/index.html`).text();
 
       return new Response(hydrate(page, resultFromHydration), {
         headers: {
