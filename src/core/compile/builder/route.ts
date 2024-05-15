@@ -7,78 +7,73 @@ import { getFilePath } from "@src/utils/getFilePath";
 import getFileStructure from "@src/utils/getFileStructure";
 import { deepMerge } from "@src/utils/mergeDeepObjects";
 import type {
-  EventsReturn,
   Head,
   MainProfile,
-  PageFunction,
   Profile,
   RouteInfo,
+  ServerReturn,
 } from "@type/index";
 import compilePage from "../compiler";
 
 export async function buildRoutes(
   defaultPath = "",
-  defaultRouteInfo?: RouteInfo,
+  defaultRouteInfo = {} as RouteInfo,
 ): Promise<RouteInfo | undefined> {
   const basePath = getFilePath(["/app/pages", defaultPath]);
   const fileStructure = await getFileStructure(basePath);
 
-  const currentRouteInfo = await buildPage(defaultPath, defaultRouteInfo);
-  let childrenRouteInfo: RouteInfo | undefined;
+  const currentRenderingMethod = (await import(`${basePath}/server.ts`))
+    .default as Profile;
+
+  defaultRouteInfo[defaultPath === "" ? "/" : defaultPath] =
+    currentRenderingMethod.method;
+
+  await buildPage(defaultPath);
 
   for (const currentFolder of fileStructure.folders) {
-    childrenRouteInfo = await buildRoutes(
-      `${defaultPath}/${currentFolder}`,
-      currentRouteInfo,
+    deepMerge(
+      defaultRouteInfo,
+      await buildRoutes(`${defaultPath}/${currentFolder}`, defaultRouteInfo),
     );
   }
 
-  return currentRouteInfo;
+  return defaultRouteInfo;
 }
 
-async function buildPage(
-  defaultPath: string,
-  defaultRouteInfo?: RouteInfo,
-): Promise<RouteInfo | undefined> {
+async function buildPage(defaultPath: string): Promise<void> {
   try {
     if (defaultPath !== "")
       await fs.mkdir(getFilePath(["/puriffied/pages", defaultPath]));
 
-    const finalProfile = await importProfile(defaultPath);
-    const events = await importEvents(defaultPath);
-    const pageFunction = await importPage(defaultPath);
+    const server = await importEvents(defaultPath);
+    const client = (
+      await import(getFilePath(["/app/pages", defaultPath, "client.ts"]))
+    ).default;
 
-    const resultFromCompilation = await events.OnCompilation({
+    const compilationResult = await server.OnCompilation({
       fromComputer: getFromComputer(),
       fromLocal: getFromLocal(),
-      fromMetadata: finalProfile.metadata as Head,
+      fromMetadata: server.default.metadata as Head,
     });
 
-    const { body: pageBody, head: pageHead } = pageFunction({
+    const { body: pageBody, head: pageHead } = client({
       fromComputer: getFromComputer(),
-      fromCompilation: resultFromCompilation,
+      fromCompilation: compilationResult,
       fromHydration: getFromHydration(),
       fromLocal: getFromLocal(),
     });
 
-    const mergedHead = deepMerge<typeof pageHead>(
-      finalProfile.metadata,
-      pageHead,
-    );
-
-    const compiledPage = await compilePage({
-      body: pageBody,
-      head: mergedHead as Head,
-    });
-
     await fs.writeFile(
       getFilePath(["/puriffied/pages", defaultPath, "index.html"]),
-      compiledPage,
+      await compilePage({
+        body: pageBody,
+        head: deepMerge<typeof pageHead>(server.default.metadata, pageHead),
+      }),
     );
 
     await Bun.build({
       ...defaultBuildingConfiguration,
-      entrypoints: [getFilePath(["/app/pages", defaultPath, "events.ts"])],
+      entrypoints: [getFilePath(["/app/pages", defaultPath, "server.ts"])],
       outdir: getFilePath(["/puriffied/pages", defaultPath]),
       minify: {
         whitespace: true,
@@ -87,36 +82,23 @@ async function buildPage(
       },
     });
 
-    return {
-      index: finalProfile.method,
-      ...defaultRouteInfo,
-    };
+    return;
   } catch (error) {
     console.error(error);
     return;
   }
 }
 
-async function importProfile(defaultPath: string): Promise<Profile> {
+async function importEvents(defaultPath: string): Promise<ServerReturn> {
   const baseProfile = (await import(getFilePath("/app/puriffy.config.ts")))
     .default as MainProfile;
 
-  const profile = (
-    await import(getFilePath(["/app/pages", defaultPath, "profile.ts"]))
-  ).default as Profile;
+  const event = (await import(
+    getFilePath(["/app/pages", defaultPath, "server.ts"])
+  )) as ServerReturn;
 
-  return deepMerge<Profile>(baseProfile, profile);
-}
-
-async function importEvents(defaultPath: string): Promise<EventsReturn> {
-  return (await import(
-    getFilePath(["/app/pages", defaultPath, "events.ts"])
-  )) as EventsReturn;
-}
-
-async function importPage(
-  defaultPath: string,
-): Promise<PageFunction<void, void>> {
-  return (await import(getFilePath(["/app/pages", defaultPath, "page.ts"])))
-    .default;
+  return {
+    ...event,
+    default: deepMerge<Profile>(baseProfile, event),
+  };
 }
