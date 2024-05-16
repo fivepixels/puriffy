@@ -4,9 +4,9 @@ import type {
   FromComputer,
   FromHydration,
   FromLocal,
-} from "./events";
+} from "./server";
 
-export type PageFunction<T, U> = (
+export type PageFunction<T = void, U = void> = (
   pageFunctions: PageReceive<T, U>,
 ) => WebPage<false>;
 
