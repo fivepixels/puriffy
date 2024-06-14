@@ -1,18 +1,8 @@
 import type { Profile } from "@type/index";
-import type {
-  OnCompilationFunction,
-  OnHydrationFunction,
-  OnRequestFunction,
-} from "puriffy";
+import type { OnCompilationFunction, OnRequestFunction } from "puriffy";
 
 export const OnCompilation: OnCompilationFunction = async () => {
   console.log("On Compilation: 500");
-
-  return;
-};
-
-export const OnHydration: OnHydrationFunction = () => {
-  console.log("On Hydration: 500");
 
   return;
 };

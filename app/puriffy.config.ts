@@ -13,6 +13,7 @@ const Profile: MainProfile = {
     author: "Seol SO",
     keywords: ["puriffy", "keywords"],
   },
+  style: {},
 };
 
 export default Profile;

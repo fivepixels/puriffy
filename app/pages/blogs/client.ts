@@ -1,14 +1,17 @@
 import type { PageFunction } from "puriffy";
 import type { OnCompilationReturn, OnHydrationRetrun } from "./server";
 
-const BlogsPage: PageFunction<OnCompilationReturn, OnHydrationRetrun> = ({
-  fromCompilation,
-  fromHydration,
-}) => {
+const BlogsPageFunction: PageFunction<
+  OnCompilationReturn,
+  OnHydrationRetrun
+> = ({ fromCompilation, fromHydration }) => {
   return {
     head: {
+      lang: "en",
       title: "Blogs",
       description: "See all blogs here.",
+      keywords: ["blogs"],
+      author: "Seol SO",
     },
     body: {
       nav: [],
@@ -38,7 +41,7 @@ const BlogsPage: PageFunction<OnCompilationReturn, OnHydrationRetrun> = ({
             },
             {
               tag: "span",
-              children: `From Hydration(expected to be Seol Su): ${fromHydration.use(
+              children: `From Hydration(expected to be Seol Sooo): ${fromHydration.use(
                 "hydrationName",
               )}`,
             },
@@ -50,4 +53,4 @@ const BlogsPage: PageFunction<OnCompilationReturn, OnHydrationRetrun> = ({
   };
 };
 
-export default BlogsPage;
+export default BlogsPageFunction;

@@ -1,5 +1,4 @@
 import fs from "node:fs/promises";
-import { getFilePath } from "@src/utils/getFilePath";
 import type { BuildConfig } from "bun";
 
 export const defaultBuildingConfiguration: BuildConfig = {
@@ -12,16 +11,21 @@ export const defaultBuildingConfiguration: BuildConfig = {
 };
 
 // remove the dist folder
-await fs.rm(getFilePath("dist"), { recursive: true, force: true });
+await fs.rm(`${process.cwd()}/dist`, { recursive: true, force: true });
 
 // compile the core puriffy
 await Bun.build({
   ...defaultBuildingConfiguration,
-  entrypoints: [getFilePath("/src/core/index.ts")],
+  entrypoints: [`${process.cwd()}/src/index.ts`],
   target: "node",
   minify: {
     whitespace: true,
     syntax: true,
     identifiers: false,
   },
+});
+
+Bun.spawn(["bunx", "tsc", "--outdir", `${process.cwd()}/dist`], {
+  stdout: "inherit",
+  stderr: "inherit",
 });

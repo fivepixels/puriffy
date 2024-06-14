@@ -1,40 +1,40 @@
 import type { PageFunction } from "puriffy";
 
-const IndexPageFunction: PageFunction = ({ fromComputer }) => {
-  const compilationCalledAt = fromComputer.time.toString();
-
+const IndexPageFunction: PageFunction = () => {
   return {
     head: {
-      title: `When this page was built?`,
-      description: `Do you want to know when it was built?`,
-      keywords: ["builtAt"],
+      lang: "en",
+      title: `Animating Test`,
+      description: `Animating Test`,
+      keywords: ["animating", "colours"],
+      author: "Soel So",
     },
     body: {
-      nav: [],
       main: [
-        {
-          tag: "h1",
-          children: "Do you know when this web page was built at?",
-        },
         {
           tag: "div",
           children: [
             {
+              tag: "h1",
+              children: "Hello World",
+            },
+            {
               tag: "p",
-              children: "The answer is...",
-            },
-            {
-              tag: "span",
-              children: `${compilationCalledAt}!`,
-            },
-            {
-              tag: "span",
-              children: `compiled at ${compilationCalledAt}`,
+              children:
+                "In this page, I am going to animate the colour of this shape",
             },
           ],
         },
+        {
+          tag: "div",
+          id: "theshape",
+          style: {
+            width: "20px",
+            height: "20px",
+            backgroundColor: "rgb(255, 0, 0)",
+          },
+        },
       ],
-      footer: [],
     },
   };
 };

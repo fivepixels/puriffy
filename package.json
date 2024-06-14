@@ -8,7 +8,7 @@
   "homepage": "https://puriffy.dev",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "./types/index.ts",
   "keywords": [
     "puriffy",
     "puriffy.js"
@@ -39,15 +39,15 @@
   "scripts": {
     "build": "bun run ./scripts/build.ts && bun link puriffy",
     "dev": "nodemon  --exec \"bun run build && bun run test\"",
-    "dev:server": "nodemon  --exec \"bun run build && puriffier build && bun run ./puriffied/server.js\"",
+    "dev:server": "nodemon  --exec \"bun run build && bun run ./src/server/index.ts\"",
     "test": "bun test",
-    "check": "bunx @biomejs/biome check --apply src types scripts"
+    "check": "biome check --write src types scripts app"
   },
   "dependencies": {
     "puriffy": "link:puriffy"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.7.0",
+    "@biomejs/biome": "latest",
     "@types/bun": "latest",
     "nodemon": "^3.1.0"
   },
@@ -57,6 +57,7 @@
   "nodemonConfig": {
     "watch": [
       "src",
+      "app",
       "scripts",
       "test",
       "puriffied"

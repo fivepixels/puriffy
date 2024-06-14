@@ -8,16 +8,17 @@ import type {
 export interface OnCompilationReturn {
   blogList: string[];
 }
-export const OnCompilation: OnCompilationFunction<OnCompilationReturn> =
-  async ({ fromLocal }) => {
-    console.log("On Compilation: Blogs");
+export const OnCompilation: OnCompilationFunction<
+  OnCompilationReturn
+> = async ({ fromLocal }) => {
+  console.log("On Compilation: Blogs");
 
-    const blogList = (await fromLocal.docs.getList()).files;
+  const blogList = fromLocal.docs.getFiles();
 
-    return {
-      blogList,
-    };
+  return {
+    blogList: blogList ? blogList : [],
   };
+};
 
 export interface OnHydrationRetrun {
   requestNum: string;

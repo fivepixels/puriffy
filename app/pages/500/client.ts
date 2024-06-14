@@ -1,9 +1,13 @@
 import type { PageFunction } from "@type/index";
 
-const ServerErrorPage: PageFunction = () => {
+const ServerErrorPageFunction: PageFunction = () => {
   return {
     head: {
+      lang: "en",
       title: "Oops! Server Error!",
+      description: "asdjkfl",
+      keywords: ["jsflk"],
+      author: "jsklfd",
     },
     body: {
       main: [
@@ -20,4 +24,4 @@ const ServerErrorPage: PageFunction = () => {
   };
 };
 
-export default ServerErrorPage;
+export default ServerErrorPageFunction;

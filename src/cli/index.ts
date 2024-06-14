@@ -1,6 +1,7 @@
 #!/usr/bin/env bun
 
-import { check, build } from "@src/core";
+import compile from "@src/compile";
+import { spawn } from "bun";
 
 main(Bun.argv[2], Bun.argv.slice(3));
 
@@ -8,7 +9,7 @@ interface PuriffierCommands {
   command: string;
   description: string;
   options?: CommandOptions[];
-  actions: (args: string[]) => void | Promise<void>;
+  action: (args: string[]) => void | Promise<void>;
 }
 
 interface CommandOptions {
@@ -20,36 +21,37 @@ async function main(command: string, args: string[]): Promise<void> {
     {
       command: "begin",
       description: "Begin a puriffy project.",
-      actions() {
-        console.log("!BEGIN!");
-      },
-    },
-    {
-      command: "dev",
-      description: "Test your puriffy project.",
-      actions() {
-        console.log("!DEV!");
+      async action() {
+        spawn([
+          "git",
+          "clone",
+          "https://github.com/puriffy/quickstart.git",
+          ".",
+        ]);
+        return;
       },
     },
     {
       command: "generate",
       description: "Generate something on your puriffy project.",
-      actions() {
+      action() {
         console.log("!GENERATE!");
+        return;
       },
     },
     {
       command: "build",
       description: "Build your puriffy project.",
-      async actions() {
-        await build();
+      action() {
+        compile();
       },
     },
     {
       command: "start",
       description: "Start your puriffy project.",
-      actions() {
-        console.log("!START!");
+      async action() {
+        spawn(["bun", "run", `${process.cwd()}/src/server/index.js`]);
+        return;
       },
     },
   ];
@@ -58,10 +60,16 @@ async function main(command: string, args: string[]): Promise<void> {
     (value) => value.command === command,
   );
 
-  if (command === "help" || indexOfFoundCommand <= -1) {
+  if (indexOfFoundCommand <= -1) {
+    console.log("COMMAND NOT FOUND.");
     return;
   }
 
   const foundCommand = puriffierCommands[indexOfFoundCommand];
-  await foundCommand.actions(args);
+
+  const start = performance.now();
+  await foundCommand.action(args);
+  const end = performance.now();
+
+  console.log(`COMMAND DONE IN ${end - start}ms.`);
 }

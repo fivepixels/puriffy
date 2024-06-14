@@ -1,9 +1,13 @@
 import type { PageFunction } from "@type/index";
 
-const NotFoundPage: PageFunction = () => {
+const NotFoundPageFunction: PageFunction = () => {
   return {
     head: {
+      lang: "en",
       title: "Oops! Server Error!",
+      description: "Server Error",
+      keywords: ["jslkdf"],
+      author: "none",
     },
     body: {
       main: [
@@ -20,4 +24,4 @@ const NotFoundPage: PageFunction = () => {
   };
 };
 
-export default NotFoundPage;
+export default NotFoundPageFunction;

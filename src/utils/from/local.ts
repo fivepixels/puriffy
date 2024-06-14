@@ -1,7 +1,6 @@
-import fs from "node:fs/promises";
-import { getFilePath } from "@src/utils/getFilePath";
+import fs from "node:fs";
 import type { FromLocal, LocalType } from "@type/index";
-import getFileStructure from "../getFileStructure";
+import { getFileNames, getFolderNames } from "../files";
 
 export function getFromLocal(): FromLocal {
   const returnedObject: Partial<FromLocal> = {};
@@ -9,28 +8,48 @@ export function getFromLocal(): FromLocal {
 
   for (const currentLocalType of allLocalFileTypes) {
     returnedObject[currentLocalType] = {
-      async use(title) {
-        return await getLocalFile(currentLocalType, title);
+      async getFileText(id: string) {
+        const filePath = `${process.cwd()}/puriffied/public/local/${currentLocalType}/${id}`;
+        const selectedFile = Bun.file(filePath);
+
+        if (!(await selectedFile.exists())) {
+          return false;
+        }
+
+        return await selectedFile.text();
       },
-      async getList() {
-        return await getFileStructure(
-          getFilePath(["/puriffied/public/local/", currentLocalType]),
-        );
+      async checkIfExists(id: string) {
+        return await Bun.file(
+          `${process.cwd()}/puriffied/public/local/${currentLocalType}/${id}`,
+        ).exists();
+      },
+      getFolders(id?: string) {
+        const basePath = `${process.cwd()}/puriffied/public/local/${currentLocalType}${
+          id ? id : ""
+        }`;
+        const doesFolderExist = fs.existsSync(basePath);
+
+        if (!doesFolderExist) {
+          return false;
+        }
+
+        return getFolderNames(basePath);
+      },
+      getFiles(id?: string) {
+        const basePath = `${process.cwd()}/puriffied/public/local/${currentLocalType}${
+          id ? id : ""
+        }`;
+
+        const doesFolderExist = fs.existsSync(basePath);
+
+        if (!doesFolderExist) {
+          return false;
+        }
+
+        return getFileNames(basePath);
       },
     };
   }
 
   return returnedObject as FromLocal;
-}
-
-export async function getLocalFile(
-  type: LocalType,
-  title: string,
-): Promise<string> {
-  return await fs.readFile(
-    getFilePath(["/puriffied/public/local/", type, title]),
-    {
-      encoding: "utf-8",
-    },
-  );
 }
